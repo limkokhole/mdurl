@@ -1,6 +1,6 @@
 # mdurl
 mkdir and cd to new directory (increment name if duplicated) by pasting url, while the directory name is relevant to url.  
-Useful if you want to perform new task with an url in a unique directory, without have to think the directory name and cd manually.
+Useful if you want to perform new task with an url in an unique directory, without have to think the directory name and cd manually.
 
 ### Usage:
 
