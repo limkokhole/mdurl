@@ -20,25 +20,28 @@ function unique_fname() { #$1 name, $2 output ext
                         return 1
                 fi
         fi
-        #echo "$fname.$fext" 'exists?'
+        #echo "$fname.$fext" 'exists?' > /tmp/bash.log; return 1;
         if [ ! -e "$fname.$fext" ]; then
-                #echo "$fname.$fext" not exists #careful if caller rely on return value, then don't echo extra thing when return 0
+                #echo "$fname.$fext" not exists  >> /tmp/bash.log #careful if caller rely on return value, then don't echo extra thing when return 0
                 echo -n "$fname.$fext"
                 return 0
         else
                 fn_no_ext="${fname%fext?*}"
-                #echo 'fname:'"$fname"
-                #echo 'fext:'"$fext"
-                #echo 'fn_no_ext:'"$fn_no_ext"
-                w=$(ls -1 | egrep "$fn_no_ext"_[0-9]+"\.$fext" | wc -l)
+                #echo 'fname:'"$fname" >> /tmp/bash.log
+                #echo 'fext:'"$fext" >> /tmp/bash.log
+                #echo 'fn_no_ext:'"$fn_no_ext" >> /tmp/bash.log
+		local fn_no_ext_escaped="$(echo -n "$fn_no_ext" | PYTHONIOENCODING=utf-8 python -c "exec(\"import sys, re\ni=''.join(sys.stdin)\nPY3 = sys.version_info[0] >= 3\nif not PY3:\n    i=i.decode(sys.stdin.encoding)\nprint(re.escape(i))\")")"
+		#echo 'fn_no_ext_escaped:'"$fn_no_ext_escaped" >> /tmp/bash.log
+                w=$(ls -1 | egrep "'""$fn_no_ext_escape"_"'"[0-9]+"\.$fext" | wc -l)
                 #echo 'o:'$w
                 if [ $w -eq 0 ]; then w=2; else ((w=w+2)); fi #1 is missing and start from 2, so always need increment 2
                 #echo 'a:'"$w"
-                while [ -e "$fn_no_ext"_"$w""\.$fext" ]; do
-                        #echo $w exist
+		echo "$fn_no_ext"_"$w"".$fext"  >> /tmp/bash.log
+                while [ -e "$fn_no_ext"_"$w"".$fext" ]; do
+                        #echo $w exist >> /tmp/bash.log
                         ((w=w+1))
                 done
-                echo -n "$fn_no_ext"_"$w"\."$fext"
+                echo -n "$fn_no_ext"_"$w"."$fext"
                 return 0
         fi
 }
@@ -75,13 +78,13 @@ function mdurl() {
 		# to be protected (i.e., not run in multiple processes at once).
 		#sleep 5
 		if [ "$#" -ne 1 ]; then
-        		echo "Usage: mdurl <url>";
+        		echo 'Usage: mdurl <url>'
 			rm "$UNIQUE_FNAME_LOCK_FILE"
 			trap - INT TERM EXIT
         		return 1;
     		fi;
-        #maximum [:30] width to prevent too long
-        local url_base_name="$(echo -n "$1" | PYTHONIOENCODING=utf-8 python -c "exec(\"import os, sys\nurl=''.join(sys.stdin)\nPY3 = sys.version_info[0] >= 3\nif PY3:\n    from urllib.parse import urlparse\nelse:\n    from urlparse import urlparse\n    url=url.decode(sys.stdin.encoding)\na = urlparse(url)\nh=a.netloc.split(':')[0]\nif h.startswith('www'):\n    h=h[3:]\nprint(os.path.basename( (h + '_' + os.path.basename(a.path))[:30] ))\")")"
+		#maximum [:30] width to prevent too long
+		local url_base_name="$(echo -n "$1" | PYTHONIOENCODING=utf-8 python -c "exec(\"import os, sys\nurl=''.join(sys.stdin)\nPY3 = sys.version_info[0] >= 3\nif PY3:\n    from urllib.parse import urlparse\nelse:\n    from urlparse import urlparse\n    url=url.decode(sys.stdin.encoding)\na = urlparse(url)\nh=a.netloc.split(':')[0]\nif h.startswith('www'):\n    h=h[3:]\nif h.startswith('.'):\n    h=h[1:]\nprint(os.path.basename( ( h + '_' + os.path.basename(a.path) )[:30] ))\")")"
 		#echo 'url_base_name: '"$url_base_name"
 		#don't use `local` or else return code will not pass via assigment, see https://stackoverflow.com/questions/20157938/exit-code-of-variable-assignment-to-command-substitution-in-bash#comment38560986_20157997
 		#hard-coded use .d extension for dir, see https://unix.stackexchange.com/questions/4029/what-does-the-d-stand-for-in-directory-names
