@@ -1,7 +1,7 @@
 # mdurl
 mkdir and cd to new directory (increment name with '_'N if duplicated) by pasting url, while the directory name is relevant to url's hostname plus basename. 
 
-Useful if you want to perform new task with an url in an unique directory, without have to think the directory name and cd manually. Use `mmurl` will navigate to /tmp directory first automatically.
+Useful if you want to perform new task with an url in an unique directory, without have to think the directory name and cd manually. Use `mmdurl` will navigate to /tmp directory first automatically.
 
 Maximum length of directory name is 30, you can change it by look into `[30:]` code.
 ### Usage (while mmdurl (prefix 'm' means t'm'p) is cd to /tmp/ first):
