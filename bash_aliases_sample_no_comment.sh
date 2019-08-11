@@ -36,7 +36,7 @@ function mdurl() {
 			trap - INT TERM EXIT
         		return 1;
     		fi;
-		local url_base_name="$(echo -n "$1" | PYTHONIOENCODING=utf-8 python -c "exec(\"import os, sys\nurl=''.join(sys.stdin)\nPY3 = sys.version_info[0] >= 3\nif PY3:\n    from urllib.parse import urlparse\nelse:\n    from urlparse import urlparse\n    url=url.decode(sys.stdin.encoding)\na = urlparse(url)\nprint(os.path.basename(a.path))\")")"
+                local url_base_name="$(echo -n "$1" | PYTHONIOENCODING=utf-8 python -c "exec(\"import os, sys\nurl=''.join(sys.stdin)\nPY3 = sys.version_info[0] >= 3\nif PY3:\n    from urllib.parse import urlparse\nelse:\n    from urlparse import urlparse\n    url=url.decode(sys.stdin.encoding)\na = urlparse(url)\nh=a.netloc.split(':')[0]\nif h.startswith('www'):\n    h=h[3:]\nprint(os.path.basename( (h + '_' + os.path.basename(a.path))[:30] ))\")")"
 		mdurl_d_name="$(unique_fname "$url_base_name" '.d')"
 		if [ $? -eq 0 ]; then
 			mkdir "$mdurl_d_name"
@@ -51,4 +51,10 @@ function mdurl() {
 		echo "Held by process $(cat $UNIQUE_FNAME_LOCK_FILE)."
 	fi
 }
-
+function mmdurl() {
+	if [ "$#" -ne 1 ]; then
+		echo 'Usage: mmdurl <url>'
+		return 1 
+	fi
+	cd /tmp; mdurl "$@"
+}
