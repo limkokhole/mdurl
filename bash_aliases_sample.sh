@@ -36,7 +36,7 @@ function unique_fname() { #$1 name, $2 output ext
                 #echo 'o:'$w
                 if [ $w -eq 0 ]; then w=2; else ((w=w+2)); fi #1 is missing and start from 2, so always need increment 2
                 #echo 'a:'"$w"
-		echo "$fn_no_ext"_"$w"".$fext"  >> /tmp/bash.log
+		#echo "$fn_no_ext"_"$w"".$fext"  >> /tmp/bash.log
                 while [ -e "$fn_no_ext"_"$w"".$fext" ]; do
                         #echo $w exist >> /tmp/bash.log
                         ((w=w+1))
